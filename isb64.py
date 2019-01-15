@@ -1,6 +1,5 @@
 from sklearn.model_selection import train_test_split
-from sklearn import linear_model
-from sklearn import neighbors
+from sklearn import linear_model, neighbors
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
@@ -11,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def get_features(s):
+def get_features(s):  # признаки для классификации
     s = s[:32]
     return [sum(c.isdigit() for c in s) / len(s), sum(c.islower() for c in s) / len(s), s.count('=')]
 
@@ -27,7 +26,7 @@ def create_xy(fill):
 fill = open('dataset.txt', 'r', encoding='utf-8')
 X, y = create_xy(fill)
 fill.close()
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
 classifiers = [
     #linear_model.LinearRegression(),
@@ -38,7 +37,7 @@ classifiers = [
     #SVC(kernel="linear", C=0.025),
     #SVC(gamma=2, C=1),
     DecisionTreeClassifier(max_depth=5),
-    RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
+    RandomForestClassifier(max_depth=5, n_estimators=5, max_features=1),
     #MLPClassifier(alpha=1),
     AdaBoostClassifier(),
     #GaussianNB(),
@@ -49,7 +48,7 @@ data = []
 for clf in classifiers:
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
-    if y_pred[0] % 1 != 0:
+    if isinstance(y_pred[0], float):
         y_pred = list(map(round, y_pred))
     correct = 0
     for x in range(len(X_test)):
@@ -61,7 +60,6 @@ for clf in classifiers:
 data = sorted(data)
 data = np.asarray(data)
 
-collabel=("Classifier", "Accuracy")
 plt.axis('off')
-the_table = plt.table(cellText=data,colLabels=collabel,loc='center')
+plt.table(cellText=data, colLabels=("Classifier", "Accuracy"), loc='center')
 plt.show()
